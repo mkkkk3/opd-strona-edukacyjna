@@ -6,7 +6,7 @@ import User from "../../../models/User";
 async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(422).json({
-      message: "Method was not POST",
+      message: "Nieprawidłowa metoda żądania (wymagany POST)",
     });
     return;
   }
@@ -16,7 +16,7 @@ async function handler(req, res) {
 
   if (!email || !password || !username) {
     res.status(422).json({
-      message: "Email and password must exist",
+      message: "Email, hasło oraz nazwa użytkownika są wymagane",
     });
     return;
   }
@@ -32,28 +32,28 @@ async function handler(req, res) {
   if (password.length < 8) {
     res
       .status(422)
-      .json({ message: "password must be longer than 8 characters" });
+      .json({ message: "Hasło musi mieć co najmniej 8 znaków" });
     return;
   }
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const isValidEmail = emailRegex.test(email);
   if (!isValidEmail) {
-    res.status(422).json({ message: "please use valid email" });
+    res.status(422).json({ message: "Podaj poprawny adres e-mail" });
     return;
   }
 
   if (username.length > 30) {
     res
       .status(422)
-      .json({ message: "username cannot be longer than 30 characters" });
+      .json({ message: "Nazwa użytkownika nie może być dłuższa niż 30 znaków" });
     return;
   }
 
   try {
     const emailIsUsed = await User.findOne({ email: email });
     if (emailIsUsed) {
-      res.status(422).json({ message: "Email is already in use" });
+      res.status(422).json({ message: "Podany adres e-mail jest już zajęty" });
       mongoose.connection.close();
       return;
     }
@@ -65,9 +65,9 @@ async function handler(req, res) {
       username: username,
     });
     await user.save();
-    res.status(201).json({ message: "successfully created user" });
+    res.status(201).json({ message: "Użytkownik został pomyślnie utworzony" });
   } catch (error) {
-    res.status(422).json({ message: "Failed to create user" });
+    res.status(422).json({ message: "Nie udało się utworzyć użytkownika" });
   }
 
   mongoose.connection.close();
